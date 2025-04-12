@@ -31,7 +31,7 @@ jobs:
             
       - name: Remove file from all commits
         run: |
-          git filter-repo --path-glob ${{ secrets.FILE_TO_REMOVE }} --invert-paths
+          git filter-repo --path-glob ${{ secrets.FILE_TO_REMOVE }} --invert-paths --force
       
       - name: Apply filters
         run: |
