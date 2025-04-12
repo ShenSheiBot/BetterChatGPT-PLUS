@@ -28,6 +28,10 @@ jobs:
       - name: Install git-filter-repo
         run: |
           pip install git-filter-repo
+            
+      - name: Remove file from all commits
+        run: |
+          git filter-repo --path-glob ${{ secrets.FILE_TO_REMOVE }} --invert-paths
       
       - name: Apply filters
         run: |
