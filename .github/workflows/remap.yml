@@ -49,4 +49,5 @@ jobs:
       
       - name: Force push to target repository
         run: |
-          git push --force target HEAD:main
+          git push --force target --all
+          git push --force target --tags
