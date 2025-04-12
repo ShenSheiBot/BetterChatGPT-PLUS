@@ -1,0 +1,48 @@
+name: Filter Repository and Push
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  filter-and-push:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Get full history
+      
+      - name: Setup Git
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+      
+      - name: Create rule and mailmap files
+        run: |
+          echo "${{ secrets.RULE_FILE }}" > rule.txt
+          echo "${{ secrets.MAILMAP_FILE }}" > mailmap.txt
+      
+      - name: Install git-filter-repo
+        run: |
+          pip install git-filter-repo
+      
+      - name: Apply filters
+        run: |
+          git filter-repo --replace-text rule.txt
+          git filter-repo --mailmap mailmap.txt
+      
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_PRIVATE_KEY }}
+      
+      - name: Add target repository as remote
+        run: |
+          git remote add target ${{ secrets.TARGET_REPO_URL }}
+      
+      - name: Force push to target repository
+        run: |
+          git push --force target HEAD:main
